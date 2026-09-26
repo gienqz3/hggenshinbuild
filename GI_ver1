@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Genshin Impact - Quản Lý Đội Hình & Build Nhân Vật</title>
+  <style>
+    :root {
+      --bg: #0f141c;
+      --card-bg: #1a2230;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --pyro: #ef5350;
+      --hydro: #42a5f5;
+      --electro: #ab47bc;
+      --anemo: #26a69a;
+      --cryo: #80deea;
+      --geo: #ffa726;
+      --dendro: #9ccc65;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 24px 16px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    header h1 {
+      font-size: 26px;
+      color: #f1f5f9;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: var(--card-bg);
+      border: 1px solid #334155;
+      color: var(--text-muted);
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover {
+      border-color: #64748b;
+      color: #fff;
+    }
+
+    .tab-btn.active {
+      background: #2563eb;
+      border-color: #3b82f6;
+      color: #fff;
+    }
+
+    .team-container {
+      display: none;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .team-container.active {
+      display: block;
+    }
+
+    .team-desc {
+      background: #1e293b;
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      border-left: 4px solid #3b82f6;
+      color: #cbd5e1;
+    }
+
+    .character-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .char-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid #334155;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .char-header {
+      border-bottom: 1px solid #334155;
+      padding-bottom: 10px;
+    }
+
+    .char-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .char-role {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .char-level {
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: #0f172a;
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
+    .section-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #64748b;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    .info-content {
+      font-size: 13px;
+      color: #cbd5e1;
+      line-height: 1.4;
+    }
+
+    .highlight {
+      color: #f59e0b;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Bảng Kế Hoạch Đội Hình Genshin Impact</h1>
+    <p>Tổng hợp build vũ khí, thánh di vật và chỉ số đề xuất</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTeam(1)">Team 1: Bốc Hơi Hoàn Hảo</button>
+    <button class="tab-btn" onclick="switchTeam(2)">Team 2: Siêu Cường Đóng Băng</button>
+    <button class="tab-btn" onclick="switchTeam(3)">Team 3: Điện Cảm Siêu Tốc</button>
+    <button class="tab-btn" onclick="switchTeam(4)">Team 4: Đội Khai Thác Đa Năng</button>
+  </div>
+
+  <div id="content"></div>
+
+  <script>
+    const teamData = [
+      {
+        id: 1,
+        title: "TEAM 1: BỐC HƠI HOÀN HẢO",
+        desc: "Mualani lướt cắn bốc hơi, có khiên lửa Yanfei chống ngắt đòn, nạp lửa cho Xiangling C6 và nhận 40% sát thương Thủy từ Kachina.",
+        members: [
+          {
+            name: "Mualani",
+            level: "Lv. 90",
+            role: "Main DPS đứng sân",
+            weapon: "Vòng Xoáy Lướt Sóng, Chương Nhạc Lang Thang, Mẫu Hoàng Kim",
+            artifact: "4 Bí Điển Obsidian (hoặc tạm 2 HP% + 2 Tinh Thông Nguyên Tố)",
+            stats: "Đồng hồ: HP% / TTNT | Ly: ST Thủy | Nón: ST Bạo Kích",
+            subStats: "ST Bạo Kích / TL Bạo Kích > HP% > Tinh Thông NT"
+          },
+          {
+            name: "Xiangling",
+            level: "C6 | Lv. 80/90",
+            role: "Cấp Hỏa ngoài sân",
+            weapon: "Lao Câu Cá, Thương Tây Phong",
+            artifact: "4 Dấu Ấn Tách Rời",
+            stats: "Đồng hồ: Hiệu Quả Nạp | Ly: ST Hỏa | Nón: TL Bạo Kích",
+            subStats: "Hiệu Quả Nạp (200% - 220%) > TL Bạo Kích / ST Bạo Kích > TTNT"
+          },
+          {
+            name: "Kachina",
+            level: "C1 | Lv. 70/80",
+            role: "Buff 40% ST Thủy",
+            weapon: "Thương Tây Phong, Hắc Anh Thương",
+            artifact: "4 Bí Cảnh Dũng Sĩ Tro Tàn",
+            stats: "Đồng hồ: Phòng Ngự% | Ly: Phòng Ngự% | Nón: Phòng Ngự% (hoặc TLBK)",
+            subStats: "Phòng Ngự% > Hiệu Quả Nạp > TL Bạo Kích"
+          },
+          {
+            name: "Yanfei",
+            level: "C6 | Lv. 80/90",
+            role: "Khiên C4 & Hồi Máu, nạp Hỏa",
+            weapon: "Mẫu Hoàng Kim, Pháp Khí Tây Phong",
+            artifact: "2 Thiên Nhan + 2 Dấu Ấn (hoặc 4 Tông Thất)",
+            stats: "Đồng hồ: Hiệu Quả Nạp | Ly: HP% | Nón: HP%",
+            subStats: "Hiệu Quả Nạp (200%+) > HP% > TL Bạo Kích"
+          }
+        ]
+      },
+      {
+        id: 2,
+        title: "TEAM 2: SIÊU CƯỜNG ĐÓNG BĂNG",
+        desc: "Neuvillette xả vòi rồng diện rộng, Charlotte hồi máu toàn đội chạm mốc buff tối đa của Furina, Kazuha gom quái giảm kháng.",
+        members: [
+          {
+            name: "Neuvillette",
+            level: "Lv. 90",
+            role: "Main DPS trọng kích xả nước",
+            weapon: "Nghi Thức Dòng Chảy Vĩnh Hằng, Mẫu Hoàng Kim, Ngọc Ngậm Ngọc",
+            artifact: "4 Thợ Săn Marechaussee",
+            stats: "Đồng hồ: HP% | Ly: HP% (hoặc ST Thủy) | Nón: ST Bạo Kích (hoặc HP%)",
+            subStats: "ST Bạo Kích / TL Bạo Kích > HP% > Hiệu Quả Nạp (120%)"
+          },
+          {
+            name: "Furina",
+            level: "Lv. 90",
+            role: "Buff Sát Thương & Sub-DPS",
+            weapon: "Kiếm Tây Phong, Răng Rỉ Sét Đi Bụi, Kiếm Tế Lễ",
+            artifact: "4 Đoàn Kịch Hoàng Kim",
+            stats: "Đồng hồ: Hiệu Quả Nạp (hoặc HP%) | Ly: HP% | Nón: TL Bạo Kích (hoặc HP%)",
+            subStats: "Hiệu Quả Nạp (180%+) > HP% > Bạo Kích"
+          },
+          {
+            name: "Kazuha",
+            level: "Lv. 90",
+            role: "Gom quái & Giảm kháng",
+            weapon: "Thiết Phong Kích, Kiếm Tây Phong, Ánh Trăng Xiphos",
+            artifact: "4 Bóng Hình Màu Xanh",
+            stats: "Đồng hồ: Tinh Thông NT | Ly: Tinh Thông NT | Nón: Tinh Thông NT",
+            subStats: "Tinh Thông NT > Hiệu Quả Nạp (160%+) > TL Bạo Kích"
+          },
+          {
+            name: "Charlotte",
+            level: "Lv. 70/80",
+            role: "Hồi máu toàn đội & Cấp Băng",
+            weapon: "Pháp Khí Tây Phong, Mảnh Chương Tế Lễ",
+            artifact: "4 Tông Thất Cổ Kỷ (hoặc 2 Nạp + 2 Tấn Công%)",
+            stats: "Đồng hồ: Hiệu Quả Nạp | Ly: Tấn Công% | Nón: Tăng Trị Liệu (hoặc ATK/TLBK)",
+            subStats: "Hiệu Quả Nạp (200% - 220%) > Tấn Công% > TL Bạo Kích"
+          }
+        ]
+      },
+      {
+        id: 3,
+        title: "TEAM 3: ĐIỆN CẢM SIÊU TỐC",
+        desc: "Tận dụng Yelan C2 xả mưa nước và hồi chiêu E liên tục, kết hợp sấm sét Fischl C2, Mizuki gom quái hồi máu và Varesa đứng sân đập bão sét.",
+        members: [
+          {
+            name: "Varesa",
+            level: "Lv. 90",
+            role: "Main DPS Lôi - Đòn đáp Plunge",
+            weapon: "Chương Nhạc Lang Thang, Vũ khí trấn",
+            artifact: "4 Bí Điển Obsidian (hoặc 4 Lời Thề Đêm Dài)",
+            stats: "Đồng hồ: Tấn Công% | Ly: ST Lôi | Nón: Bạo Kích",
+            subStats: "ST Bạo Kích / TL Bạo Kích > Tấn Công%"
+          },
+          {
+            name: "Yelan",
+            level: "C2 | Lv. 90",
+            role: "Sub-DPS Sát Thương Khủng",
+            weapon: "Nhược Thủy, Cung Tây Phong, Tuyệt Huyền",
+            artifact: "4 Dấu Ấn Tách Rời",
+            stats: "Đồng hồ: HP% | Ly: ST Thủy | Nón: TL Bạo Kích / ST Bạo Kích",
+            subStats: "Bạo Kích > HP% > Hiệu Quả Nạp (150% - 160%)"
+          },
+          {
+            name: "Fischl",
+            level: "C2 | Lv. 80/90",
+            role: "Sub-DPS Lôi ngoài sân",
+            weapon: "Tuyệt Huyền, Cung Tây Phong, Tiếng Thở Dài Vô Tận",
+            artifact: "4 Đoàn Kịch Hoàng Kim",
+            stats: "Đồng hồ: Tấn Công% | Ly: ST Lôi | Nón: Bạo Kích",
+            subStats: "Bạo Kích > Tấn Công% > Tinh Thông NT"
+          },
+          {
+            name: "Mizuki",
+            level: "Lv. 80/90",
+            role: "Driver Phong & Hồi Máu Toàn Đội",
+            weapon: "Mảnh Chương Tế Lễ, Mẫu Kim Phách",
+            artifact: "4 Bóng Hình Màu Xanh",
+            stats: "Đồng hồ: Tinh Thông NT (hoặc Nạp) | Ly: Tinh Thông NT | Nón: TTNT (hoặc Trị Liệu)",
+            subStats: "Tinh Thông NT > Hiệu Quả Nạp > HP%"
+          }
+        ]
+      },
+      {
+        id: 4,
+        title: "TEAM 4: ĐỘI KHAI THÁC ĐA NĂNG",
+        desc: "Chuyên dụng đào đá, soi quặng trên bản đồ mini, bắn nổ quặng điện tím từ xa, thắp đuốc và lướt map băng tốc độ của Lynette C3.",
+        members: [
+          {
+            name: "Noelle",
+            level: "Lv. 50 - 60",
+            role: "Đập quặng, khiên an toàn",
+            weapon: "Bạch Ảnh Kiếm, Đại Kiếm Tây Phong",
+            artifact: "4 Giác Đấu Sĩ (hoặc 2 Phòng Ngự + 2 Nạp)",
+            stats: "Đồng hồ: Phòng Ngự% | Ly: Phòng Ngự% | Nón: Phòng Ngự%",
+            subStats: "Phòng Ngự% > Hiệu Quả Nạp"
+          },
+          {
+            name: "Ningguang",
+            level: "C1 | Lv. 20 - 40",
+            role: "Radar khoáng sản & Bắn tầm xa",
+            weapon: "Chiêu Tâm, Pháp Khí Tây Phong",
+            artifact: "Ghép bất kỳ (hoặc 2 Phiến Đá + 2 Tấn Công%)",
+            stats: "Đồng hồ: Tấn Công% | Ly: ST Nham | Nón: Bạo Kích",
+            subStats: "Bạo Kích > Tấn Công%"
+          },
+          {
+            name: "Amber",
+            level: "Lv. 40",
+            role: "Bắn nổ quặng tím, thắp đuốc",
+            weapon: "Cung Tây Phong, Cung Tế Lễ",
+            artifact: "4 Giáo Quan (hoặc 2 Nạp + 2 Tấn Công%)",
+            stats: "Đồng hồ: Hiệu Quả Nạp | Ly: Tấn Công% | Nón: Tấn Công%",
+            subStats: "Hiệu Quả Nạp"
+          },
+          {
+            name: "Lynette",
+            level: "C3 | Lv. 60/70",
+            role: "Lướt map tốc độ cao",
+            weapon: "Kiếm Tế Lễ, Kiếm Tây Phong",
+            artifact: "4 Bóng Hình Màu Xanh (hoặc ghép 2 Nạp)",
+            stats: "Đồng hồ: Hiệu Quả Nạp | Ly: ST Phong | Nón: Bạo Kích",
+            subStats: "Hiệu Quả Nạp > Bạo Kích"
+          }
+        ]
+      }
+    ];
+
+    function renderTeams() {
+      const container = document.getElementById('content');
+      container.innerHTML = teamData.map(team => `
+        <div id="team-${team.id}" class="team-container ${team.id === 1 ? 'active' : ''}">
+          <div class="team-desc">${team.desc}</div>
+          <div class="character-grid">
+            ${team.members.map(m => `
+              <div class="char-card">
+                <div class="char-header">
+                  <div class="char-name">
+                    <span>${m.name}</span>
+                    <span class="char-level">${m.level}</span>
+                  </div>
+                  <div class="char-role">${m.role}</div>
+                </div>
+                <div>
+                  <div class="section-title">Vũ khí đề xuất</div>
+                  <div class="info-content highlight">${m.weapon}</div>
+                </div>
+                <div>
+                  <div class="section-title">Thánh di vật</div>
+                  <div class="info-content">${m.artifact}</div>
+                </div>
+                <div>
+                  <div class="section-title">Dòng chính</div>
+                  <div class="info-content">${m.stats}</div>
+                </div>
+                <div>
+                  <div class="section-title">Dòng phụ ưu tiên</div>
+                  <div class="info-content">${m.subStats}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function switchTeam(teamId) {
+      document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx + 1 === teamId);
+      });
+      document.querySelectorAll('.team-container').forEach(c => {
+        c.classList.remove('active');
+      });
+      document.getElementById(`team-${teamId}`).classList.add('active');
+    }
+
+    renderTeams();
+  </script>
+</body>
+</html>
